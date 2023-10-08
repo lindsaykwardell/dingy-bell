@@ -1,6 +1,6 @@
 <template>
-  <!-- A slider to determine duration, from .5 to 10 seconds with .5 steps -->
   <section>
+    <div style="font-size: 10rem">🔔</div>
     <h1>Dingy Bell</h1>
     <p>Set the duration and click play to start the timer.</p>
     <template v-if="!playing">
@@ -10,6 +10,7 @@
       {{ whenIsNextDing }}
     </template>
     <input
+      v-if="!playing"
       v-model="duration"
       :disabled="playing"
       type="range"
@@ -17,6 +18,15 @@
       max="10"
       step="0.5"
     />
+    <!-- a loading bar, showing progress until next ding -->
+    <progress
+      v-else
+      :max="duration * 60"
+      :value="duration * 60 - Math.floor((nextDing - now) / 1000)"
+    >
+      70%
+    </progress>
+
     <button @click="playing = !playing">
       {{ playing ? "Stop" : "Play" }}
     </button>
@@ -72,5 +82,13 @@ onMounted(() => {
 section {
   display: flex;
   flex-direction: column;
+}
+
+progress {
+  width: 100%;
+}
+
+h1 {
+  margin: 1rem;
 }
 </style>
