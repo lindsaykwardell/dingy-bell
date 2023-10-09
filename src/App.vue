@@ -96,8 +96,8 @@ import { ref, watch, computed, reactive, watchEffect } from "vue";
 const duration = ref<number>(+(localStorage.getItem("duration") || "1"));
 const playing = ref<boolean>(false);
 const { play } = useSound(ding);
-const timeout = ref<undefined | number>(undefined);
-const trackNow = ref<undefined | number>(undefined);
+const timeout = ref<any>(undefined);
+const trackNow = ref<any>(undefined);
 const nextDing = ref<number>(0);
 const now = ref(Date.now());
 
@@ -176,7 +176,8 @@ h1 {
   margin: 1rem;
 }
 
-progress, input[type="range"] {
+progress,
+input[type="range"] {
   height: 1rem;
   margin: 0;
 }
