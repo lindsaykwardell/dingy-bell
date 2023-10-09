@@ -81,7 +81,7 @@
       70%
     </progress>
 
-    <button @click="playing = !playing">
+    <button style="margin-top: 0.75rem;" @click="playing = !playing">
       {{ playing ? "Stop" : "Play" }}
     </button>
   </section>
@@ -130,7 +130,7 @@ const whenIsNextDing = computed(() => {
   // If the difference is less than 60 seconds, return the difference
   if (diff < 60) return `${diff} ${diff === 1 ? "second" : "seconds"}`;
   // Otherwise, return the difference in minutes
-  return `${Math.floor(diff / 60)} ${diff / 60 === 1 ? "minute" : "minutes"}`;
+  return `${Math.floor(diff / 60)} ${diff / 60 < 2 ? "minute" : "minutes"}`;
 });
 
 const playDing = () => {
