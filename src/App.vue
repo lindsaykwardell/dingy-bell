@@ -37,7 +37,7 @@
 import ding from "./assets/ding.wav";
 // @ts-ignore
 import { useSound } from "@vueuse/sound";
-import { Ref, ref, watch, computed, onMounted } from "vue";
+import { Ref, ref, watch, computed, onMounted, reactive } from "vue";
 
 const duration = ref(1);
 const playing = ref(false);
@@ -46,13 +46,37 @@ const timeout: Ref<undefined | number> = ref(undefined);
 const nextDing = ref(0);
 const now = ref(Date.now());
 
+const wakeLock = reactive<{
+  lock: null | WakeLockSentinel;
+  request: () => void;
+  release: () => void;
+}>({
+  lock: null,
+  request() {
+    if ("wakeLock" in navigator) {
+      navigator.wakeLock
+        .request("screen")
+        .then((lock) => {
+          this.lock = lock;
+        })
+        .catch(console.error);
+    }
+  },
+  release() {
+    if (this.lock) {
+      this.lock.release();
+      this.lock = null;
+    }
+  },
+});
+
 const whenIsNextDing = computed(() => {
   // Determine the time difference between now and `nextDing` in seconds
   const diff = Math.floor((nextDing.value - now.value) / 1000);
   // If the difference is less than 60 seconds, return the difference
   if (diff < 60) return `${diff} ${diff === 1 ? "second" : "seconds"}`;
   // Otherwise, return the difference in minutes
-  return `${Math.floor(diff / 60)} ${diff === 1 ? "minute" : "minutes"}`;
+  return `${Math.floor(diff / 60)} ${diff / 60 === 1 ? "minute" : "minutes"}`;
 });
 
 const playDing = () => {
@@ -66,8 +90,10 @@ const playDing = () => {
 watch(playing, (newPlaying) => {
   if (newPlaying) {
     playDing();
+    wakeLock.request();
   } else {
     clearTimeout(timeout.value);
+    wakeLock.release();
   }
 });
 
