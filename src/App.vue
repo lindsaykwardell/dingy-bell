@@ -81,7 +81,7 @@
       70%
     </progress>
 
-    <button style="margin-top: 0.75rem;" @click="playing = !playing">
+    <button style="margin-top: 0.75rem" @click="playing = !playing">
       {{ playing ? "Stop" : "Play" }}
     </button>
   </section>
@@ -91,13 +91,14 @@
 import ding from "./assets/ding.wav";
 // @ts-ignore
 import { useSound } from "@vueuse/sound";
-import { Ref, ref, watch, computed, onMounted, reactive } from "vue";
+import { ref, watch, computed, reactive, watchEffect } from "vue";
 
-const duration = ref(1);
-const playing = ref(false);
+const duration = ref<number>(+(localStorage.getItem("duration") || "1"));
+const playing = ref<boolean>(false);
 const { play } = useSound(ding);
-const timeout: Ref<any> = ref(undefined);
-const nextDing = ref(0);
+const timeout = ref<undefined | number>(undefined);
+const trackNow = ref<undefined | number>(undefined);
+const nextDing = ref<number>(0);
 const now = ref(Date.now());
 
 const wakeLock = reactive<{
@@ -133,28 +134,31 @@ const whenIsNextDing = computed(() => {
   return `${Math.floor(diff / 60)} ${diff / 60 < 2 ? "minute" : "minutes"}`;
 });
 
-const playDing = () => {
+function playDing() {
   play();
   if (playing) {
     nextDing.value = Date.now() + duration.value * 1000 * 60;
     timeout.value = setTimeout(playDing, duration.value * 1000 * 60);
   }
-};
+}
 
 watch(playing, (newPlaying) => {
   if (newPlaying) {
     playDing();
     wakeLock.request();
+    now.value = Date.now();
+    trackNow.value = setInterval(() => {
+      now.value = Date.now();
+    }, 1000);
   } else {
     clearTimeout(timeout.value);
     wakeLock.release();
+    clearInterval(trackNow.value);
   }
 });
 
-onMounted(() => {
-  setInterval(() => {
-    now.value = Date.now();
-  }, 1000);
+watchEffect(() => {
+  localStorage.setItem("duration", duration.value.toString());
 });
 </script>
 
@@ -170,5 +174,10 @@ progress {
 
 h1 {
   margin: 1rem;
+}
+
+progress, input[type="range"] {
+  height: 1rem;
+  margin: 0;
 }
 </style>
