@@ -150,6 +150,9 @@ watch(playing, (newPlaying) => {
     trackNow.value = setInterval(() => {
       now.value = Date.now();
     }, 1000);
+    setTimeout(() => {
+      now.value = Date.now();
+    }, 1);
   } else {
     clearTimeout(timeout.value);
     wakeLock.release();
