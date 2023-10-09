@@ -96,7 +96,7 @@ import { Ref, ref, watch, computed, onMounted, reactive } from "vue";
 const duration = ref(1);
 const playing = ref(false);
 const { play } = useSound(ding);
-const timeout: Ref<undefined | number> = ref(undefined);
+const timeout: Ref<any> = ref(undefined);
 const nextDing = ref(0);
 const now = ref(Date.now());
 
