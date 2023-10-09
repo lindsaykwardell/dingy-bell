@@ -81,21 +81,34 @@
       70%
     </progress>
 
-    <button style="margin-top: 0.75rem" @click="playing = !playing">
+    <button
+      ref="playButton"
+      style="margin-top: 0.75rem"
+      @click="playing = !playing"
+    >
       {{ playing ? "Stop" : "Play" }}
     </button>
   </section>
+  <audio ref="ding" style="display: none" :src="dingWav" preload="auto" />
 </template>
 
 <script setup lang="ts">
-import ding from "./assets/ding.wav";
-// @ts-ignore
-import { useSound } from "@vueuse/sound";
-import { ref, watch, computed, reactive, watchEffect } from "vue";
+import dingWav from "./assets/ding.wav";
+import {
+  ref,
+  watch,
+  computed,
+  reactive,
+  watchEffect,
+  onMounted,
+  onUnmounted,
+} from "vue";
 
+const playButton = ref<HTMLButtonElement | null>(null);
+const ding = ref<HTMLAudioElement | null>(null);
 const duration = ref<number>(+(localStorage.getItem("duration") || "1"));
 const playing = ref<boolean>(false);
-const { play } = useSound(ding);
+
 const timeout = ref<any>(undefined);
 const trackNow = ref<any>(undefined);
 const nextDing = ref<number>(0);
@@ -136,9 +149,22 @@ const whenIsNextDing = computed(() => {
 
 function playDing() {
   play();
-  if (playing) {
+  if (playing.value) {
     nextDing.value = Date.now() + duration.value * 1000 * 60;
     timeout.value = setTimeout(playDing, duration.value * 1000 * 60);
+  }
+}
+
+function play() {
+  if (ding.value) {
+    if (playing.value) {
+      ding.value.pause();
+      ding.value.currentTime = 0;
+      ding.value.play();
+    } else {
+      ding.value.pause();
+      ding.value.currentTime = 0;
+    }
   }
 }
 
@@ -162,6 +188,18 @@ watch(playing, (newPlaying) => {
 
 watchEffect(() => {
   localStorage.setItem("duration", duration.value.toString());
+});
+
+onMounted(() => {
+  if (playButton.value) {
+    playButton.value.addEventListener("click", play);
+  }
+});
+
+onUnmounted(() => {
+  if (playButton.value) {
+    playButton.value.removeEventListener("click", play);
+  }
 });
 </script>
 
