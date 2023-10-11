@@ -10,11 +10,13 @@ export default defineConfig({
       registerType: "autoUpdate",
       manifest: {
         name: "Witchy Bell",
+        description: "A simple bell for witches",
         short_name: "Witchy Bell",
+        scope: "/",
         start_url: "/",
         display: "standalone",
         background_color: "#242424",
-        description: "A simple bell for witches",
+        theme_color: "#242424",
         icons: [
           {
             src: "/pwa-192x192.png",
@@ -28,6 +30,10 @@ export default defineConfig({
           },
         ],
       },
+      workbox: {
+        globPatterns: ["**/*"],
+      },
+      includeAssets: ["**/*"],
     }),
   ],
 });
