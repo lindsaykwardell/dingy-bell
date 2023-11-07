@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section v-if="!playing || (playing && !hideWhilePlaying)">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="32"
@@ -78,7 +78,7 @@
       :max="duration * 60"
       :value="duration * 60 - Math.floor((nextDing - now) / 1000)"
     >
-      70%
+      {{ duration * 60 - Math.floor((nextDing - now) / 1000) }}
     </progress>
 
     <button
@@ -88,7 +88,18 @@
     >
       {{ playing ? "Stop" : "Play" }}
     </button>
+    <div class="options">
+      <label>
+        <input type="checkbox" v-model="hideWhilePlaying" :disabled="playing" />
+        Hide while playing
+      </label>
+    </div>
   </section>
+  <button
+    id="full-screen-stop"
+    v-if="playing && hideWhilePlaying"
+    @click="playing = !playing"
+  ></button>
   <audio ref="ding" style="display: none" :src="dingWav" preload="auto" />
 </template>
 
@@ -108,6 +119,9 @@ const playButton = ref<HTMLButtonElement | null>(null);
 const ding = ref<HTMLAudioElement | null>(null);
 const duration = ref<number>(+(localStorage.getItem("duration") || "1"));
 const playing = ref<boolean>(false);
+const hideWhilePlaying = ref<boolean>(
+  localStorage.getItem("hideWhilePlaying") === "true"
+);
 
 const timeout = ref<any>(undefined);
 const trackNow = ref<any>(undefined);
@@ -190,6 +204,10 @@ watchEffect(() => {
   localStorage.setItem("duration", duration.value.toString());
 });
 
+watchEffect(() => {
+  localStorage.setItem("hideWhilePlaying", hideWhilePlaying.value.toString());
+});
+
 onMounted(() => {
   if (playButton.value) {
     playButton.value.addEventListener("click", play);
@@ -221,5 +239,24 @@ progress,
 input[type="range"] {
   height: 1rem;
   margin: 0;
+}
+
+.options {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+#full-screen-stop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  z-index: 100;
 }
 </style>
