@@ -69,7 +69,7 @@
       :disabled="playing"
       type="range"
       min="0.5"
-      max="10"
+      max="5"
       step="0.5"
     />
     <!-- a loading bar, showing progress until next ding -->
@@ -100,23 +100,47 @@
     v-if="playing && hideWhilePlaying"
     @click="playing = !playing"
   ></button>
+  <label>
+    Soundscape
+    <select v-model="selectedSoundscape" :disabled="playing">
+      <option :value="null">None</option>
+      <option value="morning">Morning</option>
+      <option value="evening">Evening</option>
+    </select>
+  </label>
   <audio ref="ding" style="display: none" :src="dingWav" preload="auto" />
+  <audio
+    ref="morning"
+    style="display: none"
+    :src="morningMp3"
+    preload="auto"
+    loop
+  />
+  <audio
+    ref="evening"
+    style="display: none"
+    :src="eveningMp3"
+    preload="auto"
+    loop
+  />
 </template>
 
 <script setup lang="ts">
 import dingWav from "./assets/ding.wav";
-import {
-  ref,
-  watch,
-  computed,
-  reactive,
-  watchEffect,
-  onMounted,
-  onUnmounted,
-} from "vue";
+import morningMp3 from "./assets/morning.mp3";
+import eveningMp3 from "./assets/evening.mp3";
+import { ref, watch, computed, reactive, watchEffect } from "vue";
 
 const playButton = ref<HTMLButtonElement | null>(null);
 const ding = ref<HTMLAudioElement | null>(null);
+const morning = ref<HTMLAudioElement | null>(null);
+const evening = ref<HTMLAudioElement | null>(null);
+const selectedSoundscape = ref<"morning" | "evening" | null>(
+  (localStorage.getItem("selectedSoundscape") as
+    | "morning"
+    | "evening"
+    | null) || null
+);
 const duration = ref<number>(+(localStorage.getItem("duration") || "1"));
 const playing = ref<boolean>(false);
 const hideWhilePlaying = ref<boolean>(
@@ -170,14 +194,40 @@ function playDing() {
 }
 
 function play() {
-  if (ding.value) {
+  if (ding.value && morning.value && evening.value) {
     if (playing.value) {
       ding.value.pause();
       ding.value.currentTime = 0;
       ding.value.play();
+
+      morning.value.pause();
+      evening.value.pause();
+
+      morning.value.currentTime = 0;
+      evening.value.currentTime = 0;
+
+      switch (selectedSoundscape.value) {
+        case "morning":
+          morning.value.play();
+          evening.value.pause();
+          break;
+        case "evening":
+          morning.value.pause();
+          evening.value.play();
+          break;
+        default:
+          morning.value.pause();
+          evening.value.pause();
+      }
     } else {
       ding.value.pause();
       ding.value.currentTime = 0;
+
+      morning.value.pause();
+      evening.value.pause();
+
+      morning.value.currentTime = 0;
+      evening.value.currentTime = 0;
     }
   }
 }
@@ -208,16 +258,8 @@ watchEffect(() => {
   localStorage.setItem("hideWhilePlaying", hideWhilePlaying.value.toString());
 });
 
-onMounted(() => {
-  if (playButton.value) {
-    playButton.value.addEventListener("click", play);
-  }
-});
-
-onUnmounted(() => {
-  if (playButton.value) {
-    playButton.value.removeEventListener("click", play);
-  }
+watchEffect(() => {
+  localStorage.setItem("selectedSoundscape", selectedSoundscape.value || "");
 });
 </script>
 
