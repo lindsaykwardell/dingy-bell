@@ -94,20 +94,20 @@
         Hide while playing
       </label>
     </div>
+    <label>
+      Soundscape
+      <select v-model="selectedSoundscape" :disabled="playing">
+        <option :value="null">None</option>
+        <option value="morning">Morning</option>
+        <option value="evening">Evening</option>
+      </select>
+    </label>
   </section>
   <button
     id="full-screen-stop"
     v-if="playing && hideWhilePlaying"
     @click="playing = !playing"
   ></button>
-  <label>
-    Soundscape
-    <select v-model="selectedSoundscape" :disabled="playing">
-      <option :value="null">None</option>
-      <option value="morning">Morning</option>
-      <option value="evening">Evening</option>
-    </select>
-  </label>
   <audio ref="ding" style="display: none" :src="dingWav" preload="auto" />
   <audio
     ref="morning"
@@ -194,40 +194,14 @@ function playDing() {
 }
 
 function play() {
-  if (ding.value && morning.value && evening.value) {
+  if (ding.value) {
     if (playing.value) {
       ding.value.pause();
       ding.value.currentTime = 0;
       ding.value.play();
-
-      morning.value.pause();
-      evening.value.pause();
-
-      morning.value.currentTime = 0;
-      evening.value.currentTime = 0;
-
-      switch (selectedSoundscape.value) {
-        case "morning":
-          morning.value.play();
-          evening.value.pause();
-          break;
-        case "evening":
-          morning.value.pause();
-          evening.value.play();
-          break;
-        default:
-          morning.value.pause();
-          evening.value.pause();
-      }
     } else {
       ding.value.pause();
       ding.value.currentTime = 0;
-
-      morning.value.pause();
-      evening.value.pause();
-
-      morning.value.currentTime = 0;
-      evening.value.currentTime = 0;
     }
   }
 }
@@ -243,10 +217,20 @@ watch(playing, (newPlaying) => {
     setTimeout(() => {
       now.value = Date.now();
     }, 1);
+
+    if (selectedSoundscape.value === "morning" && morning.value) {
+      morning.value.currentTime = 0;
+      morning.value.play();
+    } else if (selectedSoundscape.value === "evening" && evening.value) {
+      evening.value.currentTime = 0;
+      evening.value.play();
+    }
   } else {
     clearTimeout(timeout.value);
     wakeLock.release();
     clearInterval(trackNow.value);
+    if (morning.value) morning.value.pause();
+    if (evening.value) evening.value.pause();
   }
 });
 
