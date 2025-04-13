@@ -64,43 +64,41 @@
       </select>
     </label>
   </section>
-  <div class="fixed inset-0 flex items-center justify-center">
-    <button class="relative w-full aspect-square" @click="playing = !playing">
-      <svg class="absolute inset-0" viewBox="0 0 36 36">
-        <circle
-          class="text-stone-950"
-          cx="18"
-          cy="18"
-          r="16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        />
-        <circle
-          class="text-stone-800"
-          cx="18"
-          cy="18"
-          r="16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-dasharray="100"
-          :stroke-dashoffset="100 - remainingTimePercentage"
-          stroke-linecap="round"
-          transform="rotate(-90 18 18)"
-        />
-      </svg>
-      <div
-        class="font-[Epilogue_Variable] font-extralight text-3xl transition-all duration-300"
-        :class="{
-          'opacity-0': playing,
-          'opacity-100': !playing,
-        }"
-      >
-        Begin
-      </div>
-    </button>
-  </div>
+  <button class="relative w-full aspect-square" @click="playing = !playing">
+    <svg class="absolute inset-0" viewBox="0 0 36 36">
+      <circle
+        class="text-stone-950"
+        cx="18"
+        cy="18"
+        r="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      />
+      <circle
+        class="text-stone-800"
+        cx="18"
+        cy="18"
+        r="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-dasharray="100"
+        :stroke-dashoffset="100 - remainingTimePercentage"
+        stroke-linecap="round"
+        transform="rotate(-90 18 18)"
+      />
+    </svg>
+    <div
+      class="font-[Epilogue_Variable] font-extralight text-3xl transition-all duration-300"
+      :class="{
+        'opacity-0': playing,
+        'opacity-100': !playing,
+      }"
+    >
+      Begin
+    </div>
+  </button>
   <audio ref="ding" style="display: none" :src="dingWav" preload="auto" />
   <audio
     ref="morning"
