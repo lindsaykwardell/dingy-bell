@@ -149,9 +149,7 @@ import rainyOceanMp3 from "./assets/rainy_ocean.mp3";
 import { ref, watch, computed, reactive, watchEffect } from "vue";
 // Supports weights 100-900
 import "@fontsource-variable/epilogue";
-import { o } from "@vite-pwa/assets-generator/dist/shared/assets-generator.CtXVyBkH.js";
 
-const playButton = ref<HTMLButtonElement | null>(null);
 const ding = ref<HTMLAudioElement | null>(null);
 const morning = ref<HTMLAudioElement | null>(null);
 const evening = ref<HTMLAudioElement | null>(null);
