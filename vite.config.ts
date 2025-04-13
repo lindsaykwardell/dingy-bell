@@ -9,9 +9,9 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "Witchy Bell",
-        description: "A simple bell for witches",
-        short_name: "Witchy Bell",
+        name: "Medit",
+        description: "A simple bell for meditation",
+        short_name: "Medit",
         scope: "/",
         start_url: "/",
         display: "standalone",

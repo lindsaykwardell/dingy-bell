@@ -1,46 +1,24 @@
 <template>
-  <section v-if="!playing || (playing && !hideWhilePlaying)">
-    <div style="font-size: 8rem">🌙</div>
-
-    <h1>Moon Meditations</h1>
-    <p>Set the duration and click play to start the timer.</p>
-    <template v-if="!playing">
+  <section class="settings" v-if="!playing || (playing && !hideWhilePlaying)">
+    <label class="duration">
       {{ duration }} {{ +duration === 1 ? "minute" : "minutes" }}
-    </template>
-    <template v-else>
-      {{ whenIsNextDing }}
-    </template>
-    <input
-      v-if="!playing"
-      v-model="duration"
-      :disabled="playing"
-      type="range"
-      min="0.5"
-      max="5"
-      step="0.5"
-    />
+      <input
+        v-model="duration"
+        :disabled="playing"
+        type="range"
+        min="0.5"
+        max="5"
+        step="0.5"
+      />
+    </label>
     <!-- a loading bar, showing progress until next ding -->
-    <progress
+    <!-- <progress
       v-else
       :max="duration * 60"
       :value="duration * 60 - Math.floor((nextDing - now) / 1000)"
     >
       {{ duration * 60 - Math.floor((nextDing - now) / 1000) }}
-    </progress>
-
-    <button
-      ref="playButton"
-      style="margin-top: 0.75rem"
-      @click="playing = !playing"
-    >
-      {{ playing ? "Stop" : "Play" }}
-    </button>
-    <div class="options">
-      <label>
-        <input type="checkbox" v-model="hideWhilePlaying" :disabled="playing" />
-        Hide while playing
-      </label>
-    </div>
+    </progress> -->
     <label>
       Soundscape
       <select v-model="selectedSoundscape" :disabled="playing">
@@ -52,12 +30,14 @@
         <option value="rainyOcean">Rainy Ocean</option>
       </select>
     </label>
+    <button
+      ref="playButton"
+      style="margin-top: 0.75rem"
+      @click="playing = !playing"
+    >
+      {{ playing ? "Stop" : "Play" }}
+    </button>
   </section>
-  <button
-    id="full-screen-stop"
-    v-if="playing && hideWhilePlaying"
-    @click="playing = !playing"
-  ></button>
   <audio ref="ding" style="display: none" :src="dingWav" preload="auto" />
   <audio
     ref="morning"
@@ -245,17 +225,23 @@ watchEffect(() => {
 </script>
 
 <style scoped>
-section {
+.settings {
   display: flex;
   flex-direction: column;
+  gap: 25px;
+}
+
+.duration {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 progress {
   width: 100%;
-}
-
-h1 {
-  margin: 1rem;
 }
 
 progress,
