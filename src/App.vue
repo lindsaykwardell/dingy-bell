@@ -47,6 +47,9 @@
         <option :value="null">None</option>
         <option value="morning">Morning</option>
         <option value="evening">Evening</option>
+        <option value="forestRiver">Forest River</option>
+        <option value="oceanWaves">Ocean Waves</option>
+        <option value="rainyOcean">Rainy Ocean</option>
       </select>
     </label>
   </section>
@@ -70,22 +73,54 @@
     preload="auto"
     loop
   />
+  <audio
+    ref="forestRiver"
+    style="display: none"
+    :src="forestRiverMp3"
+    preload="auto"
+    loop
+  />
+  <audio
+    ref="oceanWaves"
+    style="display: none"
+    :src="oceanWavesMp3"
+    preload="auto"
+    loop
+  />
+  <audio
+    ref="rainyOcean"
+    style="display: none"
+    :src="rainyOceanMp3"
+    preload="auto"
+    loop
+  />
 </template>
 
 <script setup lang="ts">
 import dingWav from "./assets/ding.wav";
 import morningMp3 from "./assets/morning.mp3";
 import eveningMp3 from "./assets/evening.mp3";
+import forestRiverMp3 from "./assets/forest_river.mp3";
+import oceanWavesMp3 from "./assets/ocean.mp3";
+import rainyOceanMp3 from "./assets/rainy_ocean.mp3";
 import { ref, watch, computed, reactive, watchEffect } from "vue";
 
 const playButton = ref<HTMLButtonElement | null>(null);
 const ding = ref<HTMLAudioElement | null>(null);
 const morning = ref<HTMLAudioElement | null>(null);
 const evening = ref<HTMLAudioElement | null>(null);
-const selectedSoundscape = ref<"morning" | "evening" | null>(
+const forestRiver = ref<HTMLAudioElement | null>(null);
+const oceanWaves = ref<HTMLAudioElement | null>(null);
+const rainyOcean = ref<HTMLAudioElement | null>(null);
+const selectedSoundscape = ref<
+  "morning" | "evening" | "forestRiver" | "oceanWaves" | "rainyOcean" | null
+>(
   (localStorage.getItem("selectedSoundscape") as
     | "morning"
     | "evening"
+    | "forestRiver"
+    | "oceanWaves"
+    | "rainyOcean"
     | null) || null
 );
 const duration = ref<number>(+(localStorage.getItem("duration") || "1"));
@@ -171,6 +206,18 @@ watch(playing, (newPlaying) => {
     } else if (selectedSoundscape.value === "evening" && evening.value) {
       evening.value.currentTime = 0;
       evening.value.play();
+    } else if (
+      selectedSoundscape.value === "forestRiver" &&
+      forestRiver.value
+    ) {
+      forestRiver.value.currentTime = 0;
+      forestRiver.value.play();
+    } else if (selectedSoundscape.value === "oceanWaves" && oceanWaves.value) {
+      oceanWaves.value.currentTime = 0;
+      oceanWaves.value.play();
+    } else if (selectedSoundscape.value === "rainyOcean" && rainyOcean.value) {
+      rainyOcean.value.currentTime = 0;
+      rainyOcean.value.play();
     }
   } else {
     clearTimeout(timeout.value);
@@ -178,6 +225,9 @@ watch(playing, (newPlaying) => {
     clearInterval(trackNow.value);
     if (morning.value) morning.value.pause();
     if (evening.value) evening.value.pause();
+    if (forestRiver.value) forestRiver.value.pause();
+    if (oceanWaves.value) oceanWaves.value.pause();
+    if (rainyOcean.value) rainyOcean.value.pause();
   }
 });
 
