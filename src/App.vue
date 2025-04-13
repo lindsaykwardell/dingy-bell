@@ -1,6 +1,42 @@
 <template>
-  <section class="settings" v-if="!playing || (playing && !hideWhilePlaying)">
-    <label class="duration">
+  <section
+    class="flex flex-col items-center gap-4 p-4 transition-all duration-300"
+    :class="{
+      'opacity-0 pointer-events-none': playing,
+      'opacity-100 pointer-events-auto': !playing,
+    }"
+  >
+    <div class="flex items-center gap-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        class="text-purple-700"
+      >
+        <!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ -->
+        <g fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14.5 4.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0Z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 17l-1.158-.39a2.7 2.7 0 0 1-.642-.317l-.101-.069A2.5 2.5 0 0 1 18 14.15c0-2.437-1.744-4.517-4.123-4.918l-.89-.15C12.5 9 11.5 9 11.013 9.082l-.891.15C7.743 9.633 6 11.713 6 14.15a2.5 2.5 0 0 1-1.099 2.074l-.1.069q-.301.201-.643.317L3 17"
+            opacity=".5"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m9.5 16l-.925 1.233c-.147.196-.22.295-.304.381a2 2 0 0 1-.732.486c-.112.043-.23.073-.47.133l-1.793.448A1.685 1.685 0 0 0 5.685 22h.683c1.709 0 3.37-.554 4.737-1.579L13 19m1.5-3l.727.969c.343.458.515.687.738.856q.1.076.21.14c.242.14.52.209 1.075.348l1.474.368A1.685 1.685 0 0 1 18.315 22h-.937c-.563 0-.844 0-1.123-.016a10 10 0 0 1-2.425-.44c-.267-.083-.53-.181-1.056-.379L11 20.5"
+          />
+        </g>
+      </svg>
+      <h1
+        class="text-2xl tracking-widest text-purple-700 font-[Epilogue_Variable] font-extralight"
+      >
+        Medit
+      </h1>
+    </div>
+    <label class="flex flex-col items-center">
       {{ duration }} {{ +duration === 1 ? "minute" : "minutes" }}
       <input
         v-model="duration"
@@ -9,19 +45,16 @@
         min="0.5"
         max="5"
         step="0.5"
+        class="accent-purple-900"
       />
     </label>
-    <!-- a loading bar, showing progress until next ding -->
-    <!-- <progress
-      v-else
-      :max="duration * 60"
-      :value="duration * 60 - Math.floor((nextDing - now) / 1000)"
-    >
-      {{ duration * 60 - Math.floor((nextDing - now) / 1000) }}
-    </progress> -->
     <label>
       Soundscape
-      <select v-model="selectedSoundscape" :disabled="playing">
+      <select
+        v-model="selectedSoundscape"
+        :disabled="playing"
+        class="border border-stone-400 rounded px-2 py-1"
+      >
         <option :value="null">None</option>
         <option value="morning">Morning</option>
         <option value="evening">Evening</option>
@@ -30,14 +63,44 @@
         <option value="rainyOcean">Rainy Ocean</option>
       </select>
     </label>
-    <button
-      ref="playButton"
-      style="margin-top: 0.75rem"
-      @click="playing = !playing"
-    >
-      {{ playing ? "Stop" : "Play" }}
-    </button>
   </section>
+  <div class="fixed inset-0 flex items-center justify-center">
+    <button class="relative w-full aspect-square" @click="playing = !playing">
+      <svg class="absolute inset-0" viewBox="0 0 36 36">
+        <circle
+          class="text-stone-950"
+          cx="18"
+          cy="18"
+          r="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        />
+        <circle
+          class="text-stone-800"
+          cx="18"
+          cy="18"
+          r="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-dasharray="100"
+          :stroke-dashoffset="100 - remainingTimePercentage"
+          stroke-linecap="round"
+          transform="rotate(-90 18 18)"
+        />
+      </svg>
+      <div
+        class="font-[Epilogue_Variable] font-extralight text-3xl transition-all duration-300"
+        :class="{
+          'opacity-0': playing,
+          'opacity-100': !playing,
+        }"
+      >
+        Begin
+      </div>
+    </button>
+  </div>
   <audio ref="ding" style="display: none" :src="dingWav" preload="auto" />
   <audio
     ref="morning"
@@ -84,6 +147,9 @@ import forestRiverMp3 from "./assets/forest_river.mp3";
 import oceanWavesMp3 from "./assets/ocean.mp3";
 import rainyOceanMp3 from "./assets/rainy_ocean.mp3";
 import { ref, watch, computed, reactive, watchEffect } from "vue";
+// Supports weights 100-900
+import "@fontsource-variable/epilogue";
+import { o } from "@vite-pwa/assets-generator/dist/shared/assets-generator.CtXVyBkH.js";
 
 const playButton = ref<HTMLButtonElement | null>(null);
 const ding = ref<HTMLAudioElement | null>(null);
@@ -105,9 +171,6 @@ const selectedSoundscape = ref<
 );
 const duration = ref<number>(+(localStorage.getItem("duration") || "1"));
 const playing = ref<boolean>(false);
-const hideWhilePlaying = ref<boolean>(
-  localStorage.getItem("hideWhilePlaying") === "true"
-);
 
 const timeout = ref<any>(undefined);
 const trackNow = ref<any>(undefined);
@@ -138,13 +201,10 @@ const wakeLock = reactive<{
   },
 });
 
-const whenIsNextDing = computed(() => {
-  // Determine the time difference between now and `nextDing` in seconds
-  const diff = Math.floor((nextDing.value - now.value) / 1000);
-  // If the difference is less than 60 seconds, return the difference
-  if (diff < 60) return `${diff} ${diff === 1 ? "second" : "seconds"}`;
-  // Otherwise, return the difference in minutes
-  return `${Math.floor(diff / 60)} ${diff / 60 < 2 ? "minute" : "minutes"}`;
+const remainingTimePercentage = computed(() => {
+  const totalDuration = duration.value * 60 * 1000; // Convert minutes to milliseconds
+  const elapsedTime = totalDuration - (nextDing.value - now.value);
+  return Math.max(0, Math.min(100, (elapsedTime / totalDuration) * 100));
 });
 
 function playDing() {
@@ -175,7 +235,7 @@ watch(playing, (newPlaying) => {
     now.value = Date.now();
     trackNow.value = setInterval(() => {
       now.value = Date.now();
-    }, 1000);
+    }, 10);
     setTimeout(() => {
       now.value = Date.now();
     }, 1);
@@ -203,6 +263,7 @@ watch(playing, (newPlaying) => {
     clearTimeout(timeout.value);
     wakeLock.release();
     clearInterval(trackNow.value);
+    nextDing.value = 0;
     if (morning.value) morning.value.pause();
     if (evening.value) evening.value.pause();
     if (forestRiver.value) forestRiver.value.pause();
@@ -216,56 +277,6 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
-  localStorage.setItem("hideWhilePlaying", hideWhilePlaying.value.toString());
-});
-
-watchEffect(() => {
   localStorage.setItem("selectedSoundscape", selectedSoundscape.value || "");
 });
 </script>
-
-<style scoped>
-.settings {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.duration {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-progress {
-  width: 100%;
-}
-
-progress,
-input[type="range"] {
-  height: 1rem;
-  margin: 0;
-}
-
-.options {
-  display: flex;
-  justify-content: center;
-  padding-top: 0.5rem;
-}
-
-#full-screen-stop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: transparent;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  z-index: 100;
-}
-</style>
