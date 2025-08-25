@@ -63,6 +63,15 @@
         <option value="rainyOcean">Rainy Ocean</option>
       </select>
     </label>
+    <label class="flex items-center gap-2">
+      <input
+        v-model="bellEnabled"
+        :disabled="playing"
+        type="checkbox"
+        class="accent-purple-900"
+      />
+      Enable Bell
+    </label>
   </section>
   <button class="relative w-full aspect-square" @click="playing = !playing">
     <svg class="absolute inset-0" viewBox="0 0 36 36">
@@ -148,6 +157,9 @@ import { ref, watch, computed, reactive, watchEffect } from "vue";
 // Supports weights 100-900
 import "@fontsource-variable/epilogue";
 
+const bellEnabled = ref<boolean>(
+  (localStorage.getItem("bellEnabled") ?? "true") === "true"
+);
 const ding = ref<HTMLAudioElement | null>(null);
 const morning = ref<HTMLAudioElement | null>(null);
 const evening = ref<HTMLAudioElement | null>(null);
@@ -213,7 +225,7 @@ function playDing() {
 
 function play() {
   if (ding.value) {
-    if (playing.value) {
+    if (playing.value && bellEnabled.value) {
       ding.value.pause();
       ding.value.currentTime = 0;
       ding.value.play();
@@ -274,5 +286,9 @@ watchEffect(() => {
 
 watchEffect(() => {
   localStorage.setItem("selectedSoundscape", selectedSoundscape.value || "");
+});
+
+watchEffect(() => {
+  localStorage.setItem("bellEnabled", bellEnabled.value.toString());
 });
 </script>
