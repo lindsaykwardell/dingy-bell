@@ -108,7 +108,7 @@
     </div>
   </section>
   <button
-    class="relative w-full max-w-sm aspect-square mx-auto"
+    class="relative w-full aspect-square"
     @click="playing = !playing"
   >
     <svg class="absolute inset-0" viewBox="0 0 36 36">
