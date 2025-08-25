@@ -1,6 +1,6 @@
 <template>
   <section
-    class="flex flex-col items-center gap-4 p-4 transition-all duration-300"
+    class="flex flex-col items-center gap-8 p-4 md:p-8 transition-all duration-300"
     :class="{
       'opacity-0 pointer-events-none': playing,
       'opacity-100 pointer-events-auto': !playing,
@@ -12,7 +12,7 @@
         width="32"
         height="32"
         viewBox="0 0 24 24"
-        class="text-purple-700"
+        class="text-purple-400"
       >
         <!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ -->
         <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -31,49 +31,86 @@
         </g>
       </svg>
       <h1
-        class="text-2xl tracking-widest text-purple-700 font-[Epilogue_Variable] font-extralight"
+        class="text-3xl md:text-4xl tracking-widest text-purple-400 font-[Epilogue_Variable] font-extralight"
       >
         Medit
       </h1>
     </div>
-    <label class="flex flex-col items-center">
-      {{ duration }} {{ +duration === 1 ? "minute" : "minutes" }}
-      <input
-        v-model="duration"
-        :disabled="playing"
-        type="range"
-        min="0.5"
-        max="5"
-        step="0.5"
-        class="accent-purple-900"
-      />
-    </label>
-    <label>
-      Soundscape
-      <select
-        v-model="selectedSoundscape"
-        :disabled="playing"
-        class="border border-stone-400 rounded px-2 py-1"
+    <div class="w-full max-w-sm space-y-8">
+      <!-- Duration -->
+      <div class="space-y-2">
+        <label
+          for="duration"
+          class="flex justify-between text-lg text-stone-300 font-light"
+        >
+          <span>Duration</span>
+          <span
+            >{{ duration }} {{ +duration === 1 ? "minute" : "minutes" }}</span
+          >
+        </label>
+        <input
+          id="duration"
+          v-model="duration"
+          :disabled="playing"
+          type="range"
+          min="0.5"
+          max="5"
+          step="0.5"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+          :style="{
+            background: `linear-gradient(to right, #a855f7 ${durationPercentage}%, #44403c ${durationPercentage}%)`,
+          }"
+        />
+      </div>
+
+      <!-- Soundscape -->
+      <div class="space-y-2">
+        <label for="soundscape" class="block text-lg text-stone-300 font-light"
+          >Soundscape</label
+        >
+        <select
+          id="soundscape"
+          v-model="selectedSoundscape"
+          :disabled="playing"
+          class="w-full p-3 bg-stone-800 border border-stone-700 text-white rounded-lg focus:ring-purple-500 focus:border-purple-500"
+        >
+          <option :value="null">None</option>
+          <option value="morning">Morning</option>
+          <option value="evening">Evening</option>
+          <option value="forestRiver">Forest River</option>
+          <option value="oceanWaves">Ocean Waves</option>
+          <option value="rainyOcean">Rainy Ocean</option>
+        </select>
+      </div>
+
+      <!-- Bell Toggle -->
+      <label
+        for="bell-toggle"
+        class="flex items-center justify-between cursor-pointer"
       >
-        <option :value="null">None</option>
-        <option value="morning">Morning</option>
-        <option value="evening">Evening</option>
-        <option value="forestRiver">Forest River</option>
-        <option value="oceanWaves">Ocean Waves</option>
-        <option value="rainyOcean">Rainy Ocean</option>
-      </select>
-    </label>
-    <label class="flex items-center gap-2">
-      <input
-        v-model="bellEnabled"
-        :disabled="playing"
-        type="checkbox"
-        class="accent-purple-900"
-      />
-      Enable Bell
-    </label>
+        <span class="text-lg text-stone-300 font-light">Enable Bell</span>
+        <div class="relative">
+          <input
+            id="bell-toggle"
+            v-model="bellEnabled"
+            :disabled="playing"
+            type="checkbox"
+            class="sr-only peer"
+          />
+          <div
+            class="w-14 h-8 bg-stone-700 rounded-full peer-checked:bg-purple-600 transition-colors"
+          ></div>
+          <div
+            class="absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform peer-checked:translate-x-6"
+          ></div>
+        </div>
+      </label>
+    </div>
   </section>
-  <button class="relative w-full aspect-square" @click="playing = !playing">
+  <button
+    class="relative w-full max-w-sm aspect-square mx-auto"
+    @click="playing = !playing"
+  >
     <svg class="absolute inset-0" viewBox="0 0 36 36">
       <circle
         class="text-stone-950"
@@ -99,7 +136,7 @@
       />
     </svg>
     <div
-      class="font-[Epilogue_Variable] font-extralight text-3xl transition-all duration-300"
+      class="absolute inset-0 flex items-center justify-center font-[Epilogue_Variable] font-extralight text-5xl transition-all duration-300"
       :class="{
         'opacity-0': playing,
         'opacity-100': !playing,
@@ -213,6 +250,12 @@ const remainingTimePercentage = computed(() => {
   const totalDuration = duration.value * 60 * 1000; // Convert minutes to milliseconds
   const elapsedTime = totalDuration - (nextDing.value - now.value);
   return Math.max(0, Math.min(100, (elapsedTime / totalDuration) * 100));
+});
+
+const durationPercentage = computed(() => {
+  const min = 0.5;
+  const max = 5;
+  return ((duration.value - min) / (max - min)) * 100;
 });
 
 function playDing() {
