@@ -15,7 +15,7 @@ export default defineConfig({
       },
       manifest: {
         name: "Medit",
-        description: "A simple bell for meditation",
+        description: "Soundscapes and bell for meditation and focus",
         short_name: "Medit",
         scope: "/",
         start_url: "/",
