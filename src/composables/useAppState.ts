@@ -6,7 +6,7 @@ const bellEnabled = ref<boolean>(
 );
 
 const selectedSoundscape = ref<
-  "morning" | "evening" | "forestRiver" | "oceanWaves" | "rainyOcean" | null
+  "morning" | "evening" | "forestRiver" | "oceanWaves" | "rainyOcean" | "rainyNight" | null
 >(
   (localStorage.getItem("selectedSoundscape") as
     | "morning"
@@ -14,6 +14,7 @@ const selectedSoundscape = ref<
     | "forestRiver"
     | "oceanWaves"
     | "rainyOcean"
+    | "rainyNight"
     | null) || null
 );
 
@@ -40,6 +41,7 @@ const soundscapeNames = {
   forestRiver: "Forest River",
   oceanWaves: "Ocean Waves",
   rainyOcean: "Rainy Ocean",
+  rainyNight: "Rainy Night",
 } as const;
 
 // Persistence

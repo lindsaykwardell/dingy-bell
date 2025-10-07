@@ -183,6 +183,7 @@
           <option value="forestRiver">Forest River</option>
           <option value="oceanWaves">Ocean Waves</option>
           <option value="rainyOcean">Rainy Ocean</option>
+          <option value="rainyNight">Rainy Night</option>
         </select>
       </div>
 
@@ -214,7 +215,7 @@
       @click="$router.push('/')"
       class="w-full max-w-sm py-2 px-4 bg-stone-800 hover:bg-stone-700 text-white rounded-lg transition-colors font-medium text-sm"
     >
-      Back to Timer
+      Back
     </button>
   </div>
 </template>

@@ -12,7 +12,7 @@
         width="24"
         height="24"
         viewBox="0 0 24 24"
-        class="text-purple-400"
+        class="text-purple-400 settings-icon"
       >
         <!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ -->
         <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -164,6 +164,7 @@
             stroke-width="2"
           />
           <circle
+            v-if="timerStore.playing"
             class="text-stone-800 progress-circle"
             cx="18"
             cy="18"
@@ -253,6 +254,13 @@
     preload="auto"
     loop
   />
+  <audio
+    ref="rainyNight"
+    style="display: none"
+    :src="rainyNightMp3"
+    preload="auto"
+    loop
+  />
 </template>
 
 <script setup lang="ts">
@@ -262,6 +270,7 @@ import eveningMp3 from "./assets/evening.mp3";
 import forestRiverMp3 from "./assets/forest_river.mp3";
 import oceanWavesMp3 from "./assets/ocean.mp3";
 import rainyOceanMp3 from "./assets/rainy_ocean.mp3";
+import rainyNightMp3 from "./assets/rainy_night.mp3";
 import { ref, watch, computed, nextTick } from "vue";
 import { useAppState } from "./composables/useAppState";
 import { useTimerStore } from "./stores/timer";
@@ -286,6 +295,7 @@ const evening = ref<HTMLAudioElement | null>(null);
 const forestRiver = ref<HTMLAudioElement | null>(null);
 const oceanWaves = ref<HTMLAudioElement | null>(null);
 const rainyOcean = ref<HTMLAudioElement | null>(null);
+const rainyNight = ref<HTMLAudioElement | null>(null);
 
 // Computed properties for timer progress
 const remainingTimePercentage = computed(() => {
@@ -455,6 +465,18 @@ watch(
         ) {
           rainyOcean.value.currentTime = 0;
           rainyOcean.value.play();
+        } else if (
+          selectedSoundscape.value === "rainyNight" &&
+          rainyNight.value
+        ) {
+          rainyNight.value.currentTime = 0;
+          rainyNight.value.play();
+        } else if (
+          selectedSoundscape.value === "rainyNight" &&
+          rainyNight.value
+        ) {
+          rainyNight.value.currentTime = 0;
+          rainyNight.value.play();
         }
       }
     } else {
@@ -465,6 +487,7 @@ watch(
       if (forestRiver.value) forestRiver.value.pause();
       if (oceanWaves.value) oceanWaves.value.pause();
       if (rainyOcean.value) rainyOcean.value.pause();
+      if (rainyNight.value) rainyNight.value.pause();
     }
   }
 );
@@ -511,44 +534,10 @@ button:active {
   transform: translateY(0);
 }
 
-/* Card hover effects */
-.bg-stone-800 {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.bg-stone-800:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Timer button animations - removed hover scale to prevent SVG positioning issues */
-.aspect-square {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.aspect-square:active {
-  transform: scale(0.98);
-}
-
-/* Progress ring animation */
-circle {
-  transition: stroke-dashoffset 0.1s linear;
-}
-
 /* Ensure progress circle starts from top (12 o'clock) */
 .progress-circle {
   transform: rotate(-90deg);
   transform-origin: center;
-}
-
-/* Settings icon animation */
-svg {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Settings icon animation - only apply to settings button, not timer button */
-.settings-button:hover svg {
-  transform: rotate(90deg);
 }
 
 /* Timer wrapper - provides the positioning context */
@@ -590,10 +579,6 @@ svg {
   background: transparent;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.timer-button:hover {
-  transform: scale(1.05);
 }
 
 .timer-button:active {

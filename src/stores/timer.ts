@@ -78,6 +78,7 @@ export const useTimerStore = defineStore("timer", () => {
     nextDing.value = 0;
     pomodoroState.currentSessionStart = 0;
     pomodoroState.nextPhaseTime = 0;
+    remainingTimePercentage.value = 0;
   }
 
   function resetPomodoroState() {
