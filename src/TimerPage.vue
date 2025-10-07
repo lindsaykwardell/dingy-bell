@@ -558,7 +558,7 @@ button:active {
 .timer-container {
   pointer-events: auto;
   transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(30vh) scale(0.8);
+  transform: translateY(30dvh) scale(0.8);
   width: min(100vw, 500px);
   height: min(100vw, 500px);
 }
